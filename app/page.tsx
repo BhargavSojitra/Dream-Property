@@ -1,65 +1,108 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Property, PropertyFilters, PropertyResponse } from '@/types/property';
+import PropertyFiltersComponent from '@/components/PropertyFilters';
+import PropertyTable from '@/components/PropertyTable';
 
 export default function Home() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<PropertyFilters>({
+    city: 'Toronto',
+    top: 50,
+  });
+
+  const loadProperties = async (currentFilters: PropertyFilters) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (currentFilters.city) params.append('city', currentFilters.city);
+      if (currentFilters.stateOrProvince) params.append('stateOrProvince', currentFilters.stateOrProvince);
+      if (currentFilters.priceMin !== undefined) params.append('priceMin', currentFilters.priceMin.toString());
+      if (currentFilters.priceMax !== undefined) params.append('priceMax', currentFilters.priceMax.toString());
+      if (currentFilters.bedrooms !== undefined) params.append('bedrooms', currentFilters.bedrooms.toString());
+      if (currentFilters.propertyType) params.append('propertyType', currentFilters.propertyType);
+      if (currentFilters.mlsStatus) params.append('mlsStatus', currentFilters.mlsStatus);
+      if (currentFilters.top) params.append('top', currentFilters.top.toString());
+
+      const response = await fetch(`/api/properties?${params.toString()}`);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        const errorMessage = data.error || `Failed to fetch properties (${response.status})`;
+        throw new Error(errorMessage);
+      }
+      
+      if (!data || !data.value) {
+        console.warn('Unexpected response format:', data);
+        setProperties([]);
+      } else {
+        setProperties(data.value || []);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load properties';
+      setError(errorMessage);
+      console.error('Error loading properties:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProperties(filters);
+  }, []);
+
+  const handleFilterChange = (newFilters: PropertyFilters) => {
+    setFilters(newFilters);
+    loadProperties(newFilters);
+  };
+
+  const handleResetFilters = () => {
+    const defaultFilters: PropertyFilters = { top: 50 };
+    setFilters(defaultFilters);
+    loadProperties(defaultFilters);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="min-h-screen bg-gray-100">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Property Search</h1>
+          <p className="text-gray-600">Search and filter property listings with detailed information</p>
+        </header>
+
+        <PropertyFiltersComponent
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onReset={handleResetFilters}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+        {loading && (
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600">Loading properties...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-800">Error: {error}</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
+            <div className="mb-4 text-sm text-gray-600">
+              Showing {properties.length} {properties.length === 1 ? 'property' : 'properties'}
+              {filters.city && ` in ${filters.city}`}
+            </div>
+            <PropertyTable properties={properties} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
