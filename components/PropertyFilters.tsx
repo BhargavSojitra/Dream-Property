@@ -14,7 +14,7 @@ const PROPERTY_TYPES = [
   'Residential',
   'Commercial',
   'Farm',
-  'Land'
+  'Land',
 ];
 
 const MLS_STATUSES = [
@@ -25,12 +25,30 @@ const MLS_STATUSES = [
   'Withdrawn',
   'Cancelled',
   'Hold',
-  'New'
+  'New',
 ];
 
-const PROVINCES = ['ON', 'BC', 'AB', 'QC', 'NS', 'NB', 'MB', 'PE', 'SK', 'NL', 'YT', 'NT', 'NU'];
+const PROVINCES = [
+  'ON',
+  'BC',
+  'AB',
+  'QC',
+  'NS',
+  'NB',
+  'MB',
+  'PE',
+  'SK',
+  'NL',
+  'YT',
+  'NT',
+  'NU',
+];
 
-export default function PropertyFilters({ filters, onFilterChange, onReset }: PropertyFiltersProps) {
+export default function PropertyFilters({
+  filters,
+  onFilterChange,
+  onReset,
+}: PropertyFiltersProps) {
   const [localFilters, setLocalFilters] = useState<FilterType>(filters);
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -53,13 +71,13 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
         <div className="flex gap-3">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="px-4 py-2 text-sm font-medium text-black hover:text-gray-700 transition-colors duration-200"
+            className="px-4 py-2 text-sm font-medium text-black hover:text-gray-700 transition-colors duration-200 cursor-pointer"
           >
             {isExpanded ? 'Collapse' : 'Expand'}
           </button>
           <button
             onClick={handleReset}
-            className="px-5 py-2 text-sm font-medium bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-sm"
+            className="px-5 py-2 text-sm font-medium bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-sm cursor-pointer"
           >
             Reset
           </button>
@@ -77,7 +95,7 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
               type="text"
               value={localFilters.city || ''}
               onChange={(e) => handleChange('city', e.target.value)}
-              placeholder="e.g., Toronto"
+              placeholder="e.g., Brampton"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black placeholder-gray-400 transition-all duration-200 bg-white"
             />
           </div>
@@ -90,7 +108,12 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
             <input
               type="number"
               value={localFilters.priceMin || ''}
-              onChange={(e) => handleChange('priceMin', e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) =>
+                handleChange(
+                  'priceMin',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
               placeholder="Minimum price"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black placeholder-gray-400 transition-all duration-200 bg-white"
             />
@@ -103,7 +126,12 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
             <input
               type="number"
               value={localFilters.priceMax || ''}
-              onChange={(e) => handleChange('priceMax', e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) =>
+                handleChange(
+                  'priceMax',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
               placeholder="Maximum price"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black placeholder-gray-400 transition-all duration-200 bg-white"
             />
@@ -118,7 +146,12 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
               type="number"
               min="0"
               value={localFilters.bedrooms || ''}
-              onChange={(e) => handleChange('bedrooms', e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) =>
+                handleChange(
+                  'bedrooms',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
               placeholder="Number of bedrooms"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black placeholder-gray-400 transition-all duration-200 bg-white"
             />
@@ -134,7 +167,9 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
               onChange={(e) => handleChange('propertyType', e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black bg-white transition-all duration-200"
             >
-              <option value="" className="text-gray-400">All Types</option>
+              <option value="" className="text-gray-400">
+                All Types
+              </option>
               {PROPERTY_TYPES.map((type) => (
                 <option key={type} value={type} className="text-black">
                   {type}
@@ -153,7 +188,9 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
               onChange={(e) => handleChange('mlsStatus', e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black bg-white transition-all duration-200"
             >
-              <option value="" className="text-gray-400">All Statuses</option>
+              <option value="" className="text-gray-400">
+                All Statuses
+              </option>
               {MLS_STATUSES.map((status) => (
                 <option key={status} value={status} className="text-black">
                   {status}
@@ -172,7 +209,9 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
               onChange={(e) => handleChange('stateOrProvince', e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black bg-white transition-all duration-200"
             >
-              <option value="" className="text-gray-400">All Provinces</option>
+              <option value="" className="text-gray-400">
+                All Provinces
+              </option>
               {PROVINCES.map((province) => (
                 <option key={province} value={province} className="text-black">
                   {province}
@@ -191,7 +230,12 @@ export default function PropertyFilters({ filters, onFilterChange, onReset }: Pr
               min="1"
               max="1000"
               value={localFilters.top || 50}
-              onChange={(e) => handleChange('top', e.target.value ? Number(e.target.value) : 50)}
+              onChange={(e) =>
+                handleChange(
+                  'top',
+                  e.target.value ? Number(e.target.value) : 50
+                )
+              }
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black placeholder-gray-400 transition-all duration-200 bg-white"
             />
           </div>

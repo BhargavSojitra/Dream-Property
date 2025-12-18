@@ -1,7 +1,7 @@
 'use client';
 
 import { Property, HistoryTransactional } from '@/types/property';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 interface PropertyTableProps {
   properties: Property[];
@@ -9,7 +9,9 @@ interface PropertyTableProps {
 
 export default function PropertyTable({ properties }: PropertyTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [historyData, setHistoryData] = useState<Record<string, HistoryTransactional[]>>({});
+  const [historyData, setHistoryData] = useState<
+    Record<string, HistoryTransactional[]>
+  >({});
   const [loadingHistory, setLoadingHistory] = useState<string | null>(null);
 
   const formatCurrency = (value: number | null) => {
@@ -39,7 +41,9 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
     if (!historyData[listingKey]) {
       setLoadingHistory(listingKey);
       try {
-        const response = await fetch(`/api/history?listingKey=${encodeURIComponent(listingKey)}`);
+        const response = await fetch(
+          `/api/history?listingKey=${encodeURIComponent(listingKey)}`
+        );
         if (!response.ok) throw new Error('Failed to fetch history');
         const data = await response.json();
         setHistoryData({ ...historyData, [listingKey]: data.value });
@@ -55,7 +59,9 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
   if (properties.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
-        <p className="text-gray-500 text-lg">No properties found. Try adjusting your filters.</p>
+        <p className="text-gray-500 text-lg">
+          No properties found. Try adjusting your filters.
+        </p>
       </div>
     );
   }
@@ -102,18 +108,20 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
               const isLoadingHistory = loadingHistory === property.ListingKey;
 
               return (
-                <>
+                <React.Fragment key={property.ListingKey}>
                   <tr
-                    key={property.ListingKey}
                     onClick={() => handleRowClick(property.ListingKey)}
                     className="hover:bg-gray-50 cursor-pointer transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {property.StreetNumber} {property.StreetName} {property.StreetSuffix}
+                        {property.StreetNumber} {property.StreetName}{' '}
+                        {property.StreetSuffix}
                         {property.UnitNumber && ` #${property.UnitNumber}`}
                       </div>
-                      <div className="text-sm text-gray-500">{property.PostalCode}</div>
+                      <div className="text-sm text-gray-500">
+                        {property.PostalCode}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {property.City}
@@ -126,21 +134,30 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div>{property.PropertyType}</div>
-                      <div className="text-xs text-gray-500">{property.PropertySubType}</div>
+                      <div className="text-xs text-gray-500">
+                        {property.PropertySubType}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {property.BedroomsTotal} bed / {property.BathroomsTotalInteger} bath
+                      {property.BedroomsTotal} bed /{' '}
+                      {property.BathroomsTotalInteger} bath
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {property.BuildingAreaTotal?.toLocaleString()} {property.BuildingAreaUnits}
+                      {property.BuildingAreaTotal?.toLocaleString()}{' '}
+                      {property.BuildingAreaUnits}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        property.MlsStatus === 'Sold' ? 'bg-green-100 text-green-800' :
-                        property.MlsStatus === 'Active' ? 'bg-blue-100 text-blue-800' :
-                        property.MlsStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          property.MlsStatus === 'Sold'
+                            ? 'bg-green-100 text-green-800'
+                            : property.MlsStatus === 'Active'
+                            ? 'bg-blue-100 text-blue-800'
+                            : property.MlsStatus === 'Pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
                         {property.MlsStatus}
                       </span>
                     </td>
@@ -154,39 +171,75 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
                         <div className="space-y-4">
                           {/* Property Details */}
                           <div>
-                            <h4 className="font-semibold text-black mb-3">Property Details</h4>
+                            <h4 className="font-semibold text-black mb-3">
+                              Property Details
+                            </h4>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                               <div>
-                                <span className="text-gray-700 font-medium">Listing Key:</span>
-                                <span className="ml-2 font-semibold text-black">{property.ListingKey}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Listing Key:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {property.ListingKey}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-gray-700 font-medium">Year Built:</span>
-                                <span className="ml-2 font-semibold text-black">{property.YearBuilt || property.ApproximateAge || 'N/A'}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Year Built:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {property.YearBuilt ||
+                                    property.ApproximateAge ||
+                                    'N/A'}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-gray-700 font-medium">Parking:</span>
-                                <span className="ml-2 font-semibold text-black">{property.ParkingTotal || 0}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Parking:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {property.ParkingTotal || 0}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-gray-700 font-medium">Tax Assessed:</span>
-                                <span className="ml-2 font-semibold text-black">{formatCurrency(property.TaxAssessedValue)}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Tax Assessed:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {formatCurrency(property.TaxAssessedValue)}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-gray-700 font-medium">Listing Date:</span>
-                                <span className="ml-2 font-semibold text-black">{formatDate(property.ListingContractDate)}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Listing Date:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {formatDate(property.ListingContractDate)}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-gray-700 font-medium">Close Date:</span>
-                                <span className="ml-2 font-semibold text-black">{formatDate(property.CloseDate || null)}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Close Date:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {formatDate(property.CloseDate || null)}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-gray-700 font-medium">Original List Price:</span>
-                                <span className="ml-2 font-semibold text-black">{formatCurrency(property.OriginalListPrice)}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Original List Price:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {formatCurrency(property.OriginalListPrice)}
+                                </span>
                               </div>
                               <div>
-                                <span className="text-gray-700 font-medium">Association Fee:</span>
-                                <span className="ml-2 font-semibold text-black">{formatCurrency(property.AssociationFee)}</span>
+                                <span className="text-gray-700 font-medium">
+                                  Association Fee:
+                                </span>
+                                <span className="ml-2 font-semibold text-black">
+                                  {formatCurrency(property.AssociationFee)}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -194,20 +247,26 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
                           {/* Public Remarks */}
                           {property.PublicRemarks && (
                             <div>
-                              <h4 className="font-semibold text-black mb-3">Description</h4>
-                              <p className="text-sm text-black leading-relaxed">{property.PublicRemarks}</p>
+                              <h4 className="font-semibold text-black mb-3">
+                                Description
+                              </h4>
+                              <p className="text-sm text-black leading-relaxed">
+                                {property.PublicRemarks}
+                              </p>
                             </div>
                           )}
 
                           {/* Virtual Tour */}
                           {property.VirtualTourURLUnbranded && (
                             <div>
-                              <h4 className="font-semibold text-black mb-3">Virtual Tour</h4>
+                              <h4 className="font-semibold text-black mb-3">
+                                Virtual Tour
+                              </h4>
                               <a
                                 href={property.VirtualTourURLUnbranded}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                className="text-blue-600 hover:text-blue-800 text-sm font-medium cursor-pointer hover:underline"
                               >
                                 View Virtual Tour →
                               </a>
@@ -216,28 +275,48 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
 
                           {/* History Transactional */}
                           <div>
-                            <h4 className="font-semibold text-black mb-3">History Transactional</h4>
+                            <h4 className="font-semibold text-black mb-3">
+                              History Transactional
+                            </h4>
                             {isLoadingHistory ? (
-                              <div className="text-sm text-black">Loading history...</div>
+                              <div className="text-sm text-black">
+                                Loading history...
+                              </div>
                             ) : history.length > 0 ? (
                               <div className="max-h-64 overflow-y-auto">
                                 <table className="min-w-full divide-y divide-gray-200 text-sm">
                                   <thead className="bg-gray-100">
                                     <tr>
-                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">Field Name</th>
-                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">Old Value</th>
-                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">New Value</th>
-                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">Modified</th>
+                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">
+                                        Field Name
+                                      </th>
+                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">
+                                        Old Value
+                                      </th>
+                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">
+                                        New Value
+                                      </th>
+                                      <th className="px-4 py-2 text-left text-xs font-medium text-black">
+                                        Modified
+                                      </th>
                                     </tr>
                                   </thead>
                                   <tbody className="bg-white divide-y divide-gray-200">
                                     {history.map((hist, idx) => (
                                       <tr key={idx}>
-                                        <td className="px-4 py-2 font-medium text-black">{hist.FieldName}</td>
-                                        <td className="px-4 py-2 text-black">{hist.OldValue || '-'}</td>
-                                        <td className="px-4 py-2 font-semibold text-black">{hist.NewValue || '-'}</td>
+                                        <td className="px-4 py-2 font-medium text-black">
+                                          {hist.FieldName}
+                                        </td>
                                         <td className="px-4 py-2 text-black">
-                                          {formatDate(hist.ModificationTimestamp)}
+                                          {hist.OldValue || '-'}
+                                        </td>
+                                        <td className="px-4 py-2 font-semibold text-black">
+                                          {hist.NewValue || '-'}
+                                        </td>
+                                        <td className="px-4 py-2 text-black">
+                                          {formatDate(
+                                            hist.ModificationTimestamp
+                                          )}
                                         </td>
                                       </tr>
                                     ))}
@@ -245,14 +324,16 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
                                 </table>
                               </div>
                             ) : (
-                              <div className="text-sm text-black">No history available</div>
+                              <div className="text-sm text-black">
+                                No history available
+                              </div>
                             )}
                           </div>
                         </div>
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               );
             })}
           </tbody>

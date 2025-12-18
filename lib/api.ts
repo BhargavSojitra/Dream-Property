@@ -17,8 +17,20 @@ function buildODataFilter(filters: PropertyFilters): string {
   };
 
   if (filters.city) {
-    // Try case-insensitive search using contains function
-    filterParts.push(`contains(City, '${escapeODataString(filters.city)}')`);
+    // API doesn't support tolower(), contains(), or substringof()
+    // Use multiple OR conditions for common case variations
+    const city = filters.city;
+    const cityLower = city.toLowerCase();
+    const cityUpper = city.toUpperCase();
+    const cityTitle =
+      city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+
+    const cityVariations = [city, cityLower, cityUpper, cityTitle]
+      .filter((v, i, arr) => arr.indexOf(v) === i) // Remove duplicates
+      .map((v) => `City eq '${escapeODataString(v)}'`)
+      .join(' or ');
+
+    filterParts.push(`(${cityVariations})`);
   }
 
   if (filters.stateOrProvince) {
