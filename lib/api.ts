@@ -4,9 +4,20 @@ import {
   HistoryTransactionalResponse,
 } from '@/types/property';
 
-const API_BASE_URL = 'https://query.ampre.ca/odata';
-const BEARER_TOKEN =
-  'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2ZW5kb3IvdHJyZWIvMjgzNiIsImF1ZCI6IkFtcFVzZXJzUHJkIiwicm9sZXMiOlsiQW1wVmVuZG9yIl0sImlzcyI6InByb2QuYW1wcmUuY2EiLCJleHAiOjI1MzQwMjMwMDc5OSwiaWF0IjoxNzY0OTkzMjcwLCJzdWJqZWN0VHlwZSI6InZlbmRvciIsInN1YmplY3RLZXkiOiIyODM2IiwianRpIjoiYWMyZmE2YWZmMjk2ZWFhOSIsImN1c3RvbWVyTmFtZSI6InRycmViIn0.nlOCYD-OSO67UJkHE-1gcmvyaWFfbpXMLxdtH-xV_CM';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BEARER_TOKEN = process.env.NEXT_PUBLIC_BEARER_TOKEN;
+
+// Helper to ensure required env vars are present
+function assertEnv(name: string, value: string | undefined): string {
+  if (!value) {
+    throw new Error(
+      `Missing environment variable "${name}". Define it in .env.local`
+    );
+  }
+  return value;
+}
+assertEnv('NEXT_PUBLIC_API_BASE_URL', API_BASE_URL);
+assertEnv('NEXT_PUBLIC_BEARER_TOKEN', BEARER_TOKEN);
 
 function buildODataFilter(filters: PropertyFilters): string {
   const filterParts: string[] = [];
